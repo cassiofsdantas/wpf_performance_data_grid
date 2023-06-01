@@ -1,0 +1,25 @@
+﻿<Window x:Class="WPF_Datagrid.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:WPF_Datagrid"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="900" Width="1280">
+    <Grid>
+        <DataGrid VirtualizingPanel.IsVirtualizing="True" VirtualizingPanel.IsContainerVirtualizable="True" EnableRowVirtualization="True" EnableColumnVirtualization="True" VirtualizingPanel.VirtualizationMode="Recycling" ItemsSource="{Binding ObservableItems}">
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="COLUMN 1" IsReadOnly="True" Binding="{Binding String1}" />
+                <DataGridTextColumn Header="COLUMN 1" IsReadOnly="True" Binding="{Binding String2}"/>
+                <DataGridTextColumn Header="COLUMN 1" IsReadOnly="True" Binding="{Binding String3}"/>
+                <DataGridTextColumn Header="COLUMN 1" IsReadOnly="True" Binding="{Binding String4}"/>
+                <DataGridTextColumn Header="COLUMN 1" IsReadOnly="True" Binding="{Binding String5}"/>
+                <DataGridTextColumn Header="COLUMN 1" IsReadOnly="True" Binding="{Binding String6}"/>
+                <DataGridTextColumn Header="COLUMN 1" IsReadOnly="True" Binding="{Binding String7}"/>
+                <DataGridTextColumn Header="COLUMN 1" IsReadOnly="True" Binding="{Binding String8}"/>
+                <DataGridTextColumn Header="COLUMN 1" IsReadOnly="True" Binding="{Binding String9}"/>
+                <DataGridTextColumn Header="COLUMN 1" IsReadOnly="True" Binding="{Binding String10}"/>
+            </DataGrid.Columns>
+        </DataGrid>
+    </Grid>
+</Window>

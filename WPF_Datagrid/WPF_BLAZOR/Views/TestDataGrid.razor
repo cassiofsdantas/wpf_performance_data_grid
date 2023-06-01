@@ -1,0 +1,144 @@
+﻿@using Blazorise;
+@using Microsoft.JSInterop;
+@inject HttpClient httpClient
+
+@inject IJSRuntime JsRuntime
+
+@*<MudDataGrid Virtualize="true" Items="@ObservableItems" Filterable="true" SortMode="@SortMode.None" Groupable="false" ReadOnly="true" ev>
+    <Columns>
+        <PropertyColumn Property="x => x.String1" Title="String1" />
+        <PropertyColumn Property="x => x.String2" Title="String2" />
+        <PropertyColumn Property="x => x.String3" Title="String3" />
+        <PropertyColumn Property="x => x.String4" Title="String4" />
+        <PropertyColumn Property="x => x.String5" Title="String5" />
+        <PropertyColumn Property="x => x.String6" Title="String6" />
+        <PropertyColumn Property="x => x.String7" Title="String7" />
+        <PropertyColumn Property="x => x.String8" Title="String8" />
+        <PropertyColumn Property="x => x.String9" Title="String9" />
+        <PropertyColumn Property="x => x.String10" Title="String10" />
+    </Columns>
+</MudDataGrid>*@
+
+    <Blazorise.Row >
+    <Blazorise.Column ColumnSize="ColumnSize.Is12">
+
+        <DataGrid TItem="ModelGrid" Data="@ObservableItems" Virtualize="true" OverscanCount="10" DataGridHeight="1000" DataGridMaxHeight="1000" FixedHeaderDataGridHeight="1000" FixedHeaderDataGridMaxHeight="1000">
+            <DataGridColumns>
+                <DataGridColumn Field="@nameof(ModelGrid.String1)" Caption="String1" />
+                <DataGridColumn Field="@nameof(ModelGrid.String2)" Caption="String2" />
+                <DataGridColumn Field="@nameof(ModelGrid.String3)" Caption="String3" />
+                <DataGridColumn Field="@nameof(ModelGrid.String4)" Caption="String4" />
+                <DataGridColumn Field="@nameof(ModelGrid.String5)" Caption="String5" />
+                <DataGridColumn Field="@nameof(ModelGrid.String6)" Caption="String6" />
+                <DataGridColumn Field="@nameof(ModelGrid.String7)" Caption="String7" />
+                <DataGridColumn Field="@nameof(ModelGrid.String8)" Caption="String8" />
+                <DataGridColumn Field="@nameof(ModelGrid.String9)" Caption="String9" />
+                <DataGridColumn Field="@nameof(ModelGrid.String10)" Caption="String10" />
+            </DataGridColumns>
+        </DataGrid>
+        </Blazorise.Column>
+    </Blazorise.Row>
+
+
+<Blazorise.Row>
+    <Blazorise.Column ColumnSize="ColumnSize.Is12">
+
+        <DataGrid TItem="ModelGrid" Data="@ObservableItems" Virtualize="true" OverscanCount="10" DataGridHeight="1000" DataGridMaxHeight="1000" FixedHeaderDataGridHeight="1000" FixedHeaderDataGridMaxHeight="1000">
+            <DataGridColumns>
+                <DataGridColumn Field="@nameof(ModelGrid.String1)" Caption="String1" />
+                <DataGridColumn Field="@nameof(ModelGrid.String2)" Caption="String2" />
+                <DataGridColumn Field="@nameof(ModelGrid.String3)" Caption="String3" />
+                <DataGridColumn Field="@nameof(ModelGrid.String4)" Caption="String4" />
+                <DataGridColumn Field="@nameof(ModelGrid.String5)" Caption="String5" />
+                <DataGridColumn Field="@nameof(ModelGrid.String6)" Caption="String6" />
+                <DataGridColumn Field="@nameof(ModelGrid.String7)" Caption="String7" />
+                <DataGridColumn Field="@nameof(ModelGrid.String8)" Caption="String8" />
+                <DataGridColumn Field="@nameof(ModelGrid.String9)" Caption="String9" />
+                <DataGridColumn Field="@nameof(ModelGrid.String10)" Caption="String10" />
+            </DataGridColumns>
+        </DataGrid>
+    </Blazorise.Column>
+</Blazorise.Row>
+
+@code
+{
+    public string Height { get; set; } = "1000";
+    //public int Width { get; set; }
+
+    public class WindowDimension
+    {
+        public int Width { get; set; }
+        public int Height { get; set; }
+    }
+
+    public ObservableCollection<ModelGrid> ObservableItems { get; set; } = new();
+    public ConcurrentQueue<ModelGrid> updateQueue = new();
+    public ManualResetEvent resetEvent = new(false);
+    public ManualResetEvent waitLoop = new(false);
+
+    protected override void OnInitialized()
+    {
+        StartUpdates();
+        LoopUpdates();
+        //Height = JsRuntime.InvokeAsync<WindowDimension>("getWindowDimensions").Result.Height;
+        StartCountdown();
+    }
+
+    public void StartUpdates()
+    {
+        _ = Task.Run(async () =>
+        {
+            var fixture = new AutoFixture.Fixture();
+            while (true)
+            {
+                await Task.Delay(10);
+                var items = fixture.CreateMany<ModelGrid>(10);
+                foreach (var item in items)
+                {
+                    updateQueue.Enqueue(item);
+                    resetEvent.Set();
+                }
+            }
+        });
+    }
+
+    void StartCountdown()
+    {
+        _ = Task.Run(async () =>
+        {
+            while (true)
+            {
+                await Task.Delay(200);
+                await InvokeAsync(() =>
+                {
+                    StateHasChanged();
+                });
+            }
+        });
+    }
+
+    public void LoopUpdates()
+    {
+        _ = Task.Run(async () =>
+        {
+            while (true)
+            {
+                resetEvent.WaitOne();
+                resetEvent.Reset();
+                //await InvokeAsync(() =>
+                //{
+                while (updateQueue.TryDequeue(out var result))
+                {
+                    ObservableItems.Insert(0, result);
+                }
+
+                //await InvokeAsync(() =>
+                //{
+                //    StateHasChanged();
+                //});
+                //});
+            }
+        });
+    }
+}
+}
